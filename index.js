@@ -3,15 +3,17 @@ const cors =require('cors')
 const bodyParser = require('body-parser');
 const { storeUserContext, fetchContextFromPinecone } = require('./context.js');
 const { generateResponse } = require('./ai.js');
+const morgan = require("morgan")
 
 const app = express();
 app.use(bodyParser.json());
 app.use(express.urlencoded({extended:false}))
 app.use(cors("*"))
+app.use(morgan('dev'))
 // Endpoint to store user context
 app.post('/store-context', async (req, res) => {
   const { userId, userContext } = req.body;
-  console.log("user context---------------",userContext)
+
   try {
     await storeUserContext(userId, userContext);
     res.status(200).json({ message: `Context for user ${userId} stored successfully.` });

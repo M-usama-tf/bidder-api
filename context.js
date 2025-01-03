@@ -43,13 +43,12 @@ async function storeUserContext(userId, userContext) {
   };
 
   await index.upsert([contextData]);
-  console.log(`Context for user ${userId} stored successfully in Pinecone.`);
 }
 
 // Function to fetch user context from Pinecone
 async function fetchContextFromPinecone(userId) {
     try {
-      console.log(`Fetching context for user: ${userId}`);
+  
   
       // Define a dummy vector with the same dimension as your index
       const dummyVector = Array(384).fill(0);
