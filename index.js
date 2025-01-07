@@ -1,39 +1,72 @@
 const express = require('express');
-const cors =require('cors')
+const cors = require('cors')
 const bodyParser = require('body-parser');
-const { storeUserContext, fetchContextFromPinecone } = require('./context.js');
-const { generateResponse } = require('./ai.js');
+const connectDB = require("./config/db");
+const dotenv = require("dotenv").config();
 const morgan = require("morgan")
+const { generateResponse } = require('./ai.js');
+const { storeUserContext } = require('./context.js');
+const User = require("./models/users.js")
 
+connectDB();
 const app = express();
 app.use(bodyParser.json());
-app.use(express.urlencoded({extended:false}))
+app.use(express.urlencoded({ extended: false }))
 app.use(cors("*"))
 app.use(morgan('dev'))
-// Endpoint to store user context
+
+app.use("/api", require("./routes/users.js"));
+
 app.post('/store-context', async (req, res) => {
   const { userId, userContext } = req.body;
 
   try {
     await storeUserContext(userId, userContext);
-    res.status(200).json({ message: `Context for user ${userId} stored successfully.` });
+
+    const user = await User.findOne({ userId });
+
+    if (user) {
+      const updatedUser = await User.findOneAndUpdate(
+        { userId },
+        { context: true },
+        { new: true }
+      );
+      return res.status(200).json({ message: "Context added successfully.", user: updatedUser });
+    } else {
+      return res.status(400).json({ message: "User not found. Please add a user first." });
+    }
   } catch (error) {
-    res.status(500).json({ error: 'Error storing user context', details: error.message });
+    return res.status(500).json({
+      error: "Error storing user context",
+      details: error.message,
+    });
   }
 });
 
-// Endpoint to handle user query
+
 app.post('/handle-query', async (req, res) => {
   const { userId, userQuery } = req.body;
+
   try {
+    if (!userId || !userQuery) return res.status(400).json({ error: "userId and userQuery are required." });
+
     const response = await generateResponse(userId, userQuery);
-    res.status(200).json({ response });
+
+    const user = await User.findOneAndUpdate(
+      { userId },
+      { $inc: { limit: -1 } },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ error: "User not found or could not update limit." });
+
+    res.status(200).json({ response, updatedLimit: user.limit });
   } catch (error) {
-    res.status(500).json({ error: 'Error generating response', details: error.message });
+    res.status(500).json({ error: "Error generating response", details: error.message });
   }
 });
 
-// Start the server
+
 const PORT = process.env.PORT || 3049;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
