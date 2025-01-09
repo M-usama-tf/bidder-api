@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors')
 const bodyParser = require('body-parser');
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3049;
 const connectDB = require("./config/db");
 const dotenv = require("dotenv").config();
 const morgan = require("morgan")
@@ -12,7 +12,7 @@ const User = require("./models/users.js");
 const app = express();
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }))
-app.use(cors())
+app.use(cors({ origin: "*" }))
 app.use(morgan('dev'))
 
 app.use("/api", require("./routes/users.js"));
