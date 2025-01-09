@@ -1,14 +1,14 @@
 const express = require('express');
 const cors = require('cors')
 const bodyParser = require('body-parser');
+const PORT = process.env.PORT || 8000;
 const connectDB = require("./config/db");
 const dotenv = require("dotenv").config();
 const morgan = require("morgan")
 const { generateResponse } = require('./ai.js');
 const { storeUserContext } = require('./context.js');
-const User = require("./models/users.js")
+const User = require("./models/users.js");
 
-connectDB();
 const app = express();
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }))
@@ -67,7 +67,7 @@ app.post('/handle-query', async (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 3049;
+connectDB();
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
