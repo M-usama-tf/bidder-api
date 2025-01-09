@@ -21,7 +21,7 @@ const users = asyncHandler(async (req, res) => {
 const getSingleUser = asyncHandler(async (req, res) => {
     const { id } = req.query;
 
-    const user = await User.findOne({ userId: id });
+    const user = await User.findOne({ userId: _id });
 
     if (!user) res.status(404).json({ message: "User not found" });
 
