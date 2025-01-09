@@ -8,6 +8,11 @@ const users = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "All fields are required." });
     }
 
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        return res.status(400).json({ message: "User with this email already exists." });
+    }
+
     const user = await User.create(req.body);
 
     if (user) {
