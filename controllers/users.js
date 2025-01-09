@@ -19,14 +19,16 @@ const users = asyncHandler(async (req, res) => {
 });
 
 const getSingleUser = asyncHandler(async (req, res) => {
-    const { id } = req.query;
+    const { id } = req.params;
 
-    const user = await User.findOne({ userId: _id });
-
-    if (!user) res.status(404).json({ message: "User not found" });
-
-    if (user) res.status(200).json({ user })
-    else res.status(500).json("An unexpected error occured")
+    try {
+        const user = await User.findOne({ userId: id });
+        if (!user) return res.status(404).json({ message: "User not found" });
+        else return res.status(200).json({ user });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "An unexpected error occurred" });
+    }
 });
 
 
