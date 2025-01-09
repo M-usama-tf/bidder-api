@@ -12,7 +12,7 @@ const User = require("./models/users.js");
 const app = express();
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }))
-app.use(cors("*"))
+app.use(cors())
 app.use(morgan('dev'))
 
 app.use("/api", require("./routes/users.js"));
