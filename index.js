@@ -46,7 +46,7 @@ app.post('/store-context', async (req, res) => {
 
 app.post('/handle-query', async (req, res) => {
   const { userQuery, userId } = req.body;
-  const { jobTitle, description, jobLinks } = userQuery;
+  const { title, description, jobLinks } = userQuery;
 
   try {
     if (!userId || !userQuery) return res.status(400).json({ error: "userId and userQuery are required." });
@@ -66,7 +66,7 @@ app.post('/handle-query', async (req, res) => {
 
     await UserJob.create({
       userId,
-      jobTitle,
+      title,
       jobLinks,
       description
     });
