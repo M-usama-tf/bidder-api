@@ -5,11 +5,11 @@ const userJobSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    jobTitle: {
+    title: {
         type: String,
         required: true
     },
-    jobLink: {
+    jobLinks: {
         type: String,
         required: true
     },

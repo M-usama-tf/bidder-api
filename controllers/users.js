@@ -10,6 +10,8 @@ const users = asyncHandler(async (req, res) => {
     }
 
     const existingUser = await User.findOne({ email });
+
+    console.log("existingUser : ", existingUser);
     
     if (existingUser) {
         return res.status(200).json({
