@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/users");
+const UserJob = require("../models/userJob")
 
 const users = asyncHandler(async (req, res) => {
     const { userId, name, email } = req.body;
@@ -59,4 +60,29 @@ const getUsesJobLimit = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { users, getSingleUser, getUsesJobLimit };
+const getUsersAllJobs = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const userJobs = await UserJob.find({ userId: id });
+        
+        if (!userJobs.length) {
+            return res.status(404).json({ 
+                message: "No jobs found for this user",
+                jobs: []
+            });
+        }
+
+        return res.status(200).json({
+            message: "Jobs fetched successfully",
+            jobs: userJobs
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "An unexpected error occurred" });
+    }
+});
+
+
+module.exports = { users, getSingleUser, getUsesJobLimit, getUsersAllJobs };

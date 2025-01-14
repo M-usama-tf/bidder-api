@@ -8,6 +8,7 @@ const morgan = require("morgan")
 const { generateResponse } = require('./ai.js');
 const { storeUserContext } = require('./context.js');
 const User = require("./models/users.js");
+const UserJob = require("")
 
 const app = express();
 app.use(bodyParser.json());
@@ -44,7 +45,8 @@ app.post('/store-context', async (req, res) => {
 });
 
 app.post('/handle-query', async (req, res) => {
-  const { userId, userQuery } = req.body;
+  const { userQuery, userId, jobLink } = req.body;
+  const { title: jobTitle, description } = userQuery;
 
   try {
     if (!userId || !userQuery) return res.status(400).json({ error: "userId and userQuery are required." });
@@ -61,6 +63,13 @@ app.post('/handle-query', async (req, res) => {
     };
 
     const response = await generateResponse(userId, userQuery);
+
+    await UserJob.create({
+      userId,
+      jobTitle,
+      jobLink,
+      description
+    });
 
     const updatedUser = await User.findOneAndUpdate(
       { userId },
