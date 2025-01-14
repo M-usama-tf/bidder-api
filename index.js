@@ -8,7 +8,7 @@ const morgan = require("morgan")
 const { generateResponse } = require('./ai.js');
 const { storeUserContext } = require('./context.js');
 const User = require("./models/users.js");
-const UserJob = require("")
+const UserJob = require("./models/userJob.js")
 
 const app = express();
 app.use(bodyParser.json());
