@@ -43,24 +43,32 @@ app.post('/store-context', async (req, res) => {
   }
 });
 
-
 app.post('/handle-query', async (req, res) => {
   const { userId, userQuery } = req.body;
 
   try {
     if (!userId || !userQuery) return res.status(400).json({ error: "userId and userQuery are required." });
 
+    const user = await User.findOne({ userId });
+    
+    if (!user) return res.status(404).json({ error: "User not found." });
+
+    if (user.limit <= 0) {
+      return res.status(403).json({ 
+        error: "Query limit reached", 
+        message: "You have reached your maximum number of queries. Please upgrade to continue." 
+      });
+    };
+
     const response = await generateResponse(userId, userQuery);
 
-    const user = await User.findOneAndUpdate(
+    const updatedUser = await User.findOneAndUpdate(
       { userId },
       { $inc: { limit: -1 } },
       { new: true }
     );
 
-    if (!user) return res.status(404).json({ error: "User not found or could not update limit." });
-
-    res.status(200).json({ response, updatedLimit: user.limit });
+    res.status(200).json({ response, updatedLimit: updatedUser.limit });
   } catch (error) {
     res.status(500).json({ error: "Error generating response", details: error.message });
   }

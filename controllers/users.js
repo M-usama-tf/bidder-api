@@ -41,5 +41,22 @@ const getSingleUser = asyncHandler(async (req, res) => {
     }
 });
 
+const getUsesJobLimit = asyncHandler(async (req, res) => {
+    const { id } = req.params;
 
-module.exports = { users, getSingleUser };
+    try {
+        const user = await User.findOne({ userId: id });
+
+        if(!user) return res.status(404).json({ message: "User not found" });
+        const remainingJobApplications = user?.limit;
+        return res.status(200).json({ 
+            message: `You can apply to ${remainingJobApplications || 0} more jobs`,
+            remainingJobs: remainingJobApplications,
+            name: user?.name
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "An unexpected error occurred" });
+    }
+});
+
+module.exports = { users, getSingleUser, getUsesJobLimit };
